@@ -66,31 +66,33 @@
 				// replace space with a dash
 				$city = str_replace(' ', '-', $city);
 				if (empty($cityError)) {
-					$forecastPage = file_get_contents('http://weather-forecast.com/locations/'.$city.'/forecasts/latest');
+					$forecastPage = file_get_contents('https://weather-forecast.com/locations/'.$city.'/forecasts/latest');
 					if (empty($forecastPage)) {
 						$failError = true;
 					} else {
-						$scrapeString = ' 1 &ndash; 3 Day Weather Forecast Summary:</b><span class="read-more-small"><span class="read-more-content"> <span class="phrase">';
+						$scrapeString = '</span></p></td><td colspan="9"><span class="b-forecast__table-description-title">';
+						//$scrapeString = '</title>';
 						$contentArray = explode($scrapeString, $forecastPage);
 						if (sizeof($contentArray) < 2) {
 							$failError = true;
 						} else {
 							// Get the city name to display in message
-							$scrapeString2 = '<a class="forecast-magellan-target" name="forecast-part-0"><div data-magellan-destination="forecast-part-0"></div></a><p class="summary"><b>';
+							$scrapeString2 = '</b> is';
 							$cityArray = explode($scrapeString2, $contentArray[0]);
 							$cityName = "";
-							if (sizeof($cityArray) > 1) {
+							if (sizeof($cityArray) > 0) {
+								$scrapeString4 = '<p class="large-loc"><b>';
+								$cityArray = explode($scrapeString4, $cityArray[0]);
 								$cityName = $cityArray[1];
 							}
-
 							// Get the actual weather contents
-							$scrapeString3 = '</span></span></span></p><div class="forecast-cont">';
-							$contentArray = explode($scrapeString3, $contentArray[1]);
+							$scrapeString3 = '<span class="phrase">';
+							$contentArray = explode($scrapeString3, $contentArray[0]);
 						}
 						if (empty($contentArray[0]) || !$cityName) {
 							$failError = true;
 						} else {
-							$weatherMsg = $contentArray[0];
+							$weatherMsg = $contentArray[1];
 						}
 					}
 					if ($failError) {
